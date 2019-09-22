@@ -1,0 +1,44 @@
+import { Injectable } from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable, of} from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SessionService {
+
+  constructor(private http: HttpClient) { }
+
+  addTask(project: any) {
+    console.log(project);
+  }
+
+  getUsers():Observable<any> {
+    //return this.http.get('./assets/users.json');
+     return this.http.get('http://localhost:8080/fsd/users');
+  }
+  addUser(user: any):Observable<any> {
+    console.log(user);
+    return this.http.post("http://localhost:8080/fsd/users",user);
+    //return of([{user}]);
+
+  }
+
+  getProjectsList(): Observable<any> {
+    return this.http.get('http://localhost:8080/fsd/projects');
+  }
+
+  addProject(projects: any): Observable<any> {
+    console.log(projects);
+    return this.http.post("http://localhost:8080/fsd/projects",projects);
+
+  }
+
+  getTaskLists(): Observable<any> {
+    return this.http.get('./assets/tasks.json');
+  }
+
+  getManagerAutocomplete(): Observable<any> {
+    return this.http.get('./assets/manager.json');
+  }
+}

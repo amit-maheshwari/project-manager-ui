@@ -1,0 +1,86 @@
+<div style="margin: 2rem">
+
+  <form [formGroup]="projectForm" (ngSubmit)="add()">
+    <div class="form-group row">
+      <label for="project" class="col-sm-2 col-form-label">Project</label>
+      <div class="col-sm-10">
+        <input class="form-control" id="project" placeholder="Enter Project Name" type="text" formControlName="project">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <span class="col-sm-2"></span>
+      <div class="col-sm-10" style="display: inline-flex" >
+        <input class="form-control" style="width: 1.5rem; height: 1.4rem; margin-top: 0.5em;margin-right: 1rem" id="checkbox" type="checkbox">
+        <label for="checkbox" class="col-form-label">Set Start and End Date</label>
+        <div class="input-group col-sm-4" style="margin-left: 5rem">
+          <input class="form-control" style="display: inline-flex;" placeholder="Start Date"
+                 name="dp" formControlName="startDate" ngbDatepicker #d="ngbDatepicker">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button">
+              <i class="fa fa-calendar"></i>
+            </button>
+          </div>
+        </div>
+        <div class="input-group col-sm-4">
+          <input class="form-control" style="display: inline-flex;" placeholder="End Date"
+                 name="ed" formControlName="endDate" ngbDatepicker #ed="ngbDatepicker">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary calendar" (click)="ed.toggle()" type="button">
+              <i class="fa fa-calendar"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="priority" class="col-sm-2 col-form-label">Priority</label>
+      <div class="col-sm-10">
+        <input class="form-control" id="priority" placeholder="Enter Priority" type="range" formControlName="priority" min="0" max="40">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="manager" class="col-sm-2 col-form-label">Manager</label>
+      <div class="col-sm-10">
+        <input class="form-control" id="manager" placeholder="Enter Manager" type="text" formControlName="manager"
+               [ngbTypeahead]="type" [resultFormatter]="formatter" [inputFormatter]="formatter">
+      </div>
+    </div>
+    <div class="text-right">
+      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" [disabled]="!projectForm.valid">Add</button>
+      <button class="btn btn-primary btn-space" (click)="reset()">Reset</button>
+    </div>
+  </form>
+
+  <hr>
+
+  <div class="form-group row">
+    <input class="form-control" style="width: 50%" placeholder="Search" type="text" [formControl]="filter"/>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col" sortable="project" (sort)="onSort($event)">Project</th>
+        <th scope="col" sortable="noOfTasks" (sort)="onSort($event)">No Of Task</th>
+        <th scope="col" sortable="priority" (sort)="onSort($event)">Priority</th>
+        <th scope="col" sortable="startDate" (sort)="onSort($event)">Start Date</th>
+        <th scope="col" sortable="endDate" (sort)="onSort($event)">End Date</th>
+        <th scope="col" sortable="completed" (sort)="onSort($event)">Completed</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of filteredProjects; index as i" (click)="updateProject(project)">
+        <td><ngb-highlight [result]="project.project" [term]="filter.value"></ngb-highlight></td>
+        <td><ngb-highlight [result]="project.noOfTasks" [term]="filter.value"></ngb-highlight></td>
+        <td><ngb-highlight [result]="project.priority" [term]="filter.value"></ngb-highlight></td>
+        <td><ngb-highlight [result]="project.startDate" [term]="filter.value"></ngb-highlight></td>
+        <td><ngb-highlight [result]="project.endDate" [term]="filter.value"></ngb-highlight></td>
+        <td><ngb-highlight [result]="project.completed" [term]="filter.value"></ngb-highlight></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
