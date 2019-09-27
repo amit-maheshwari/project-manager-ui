@@ -14,13 +14,18 @@ export class AddUserComponent implements OnInit {
   filter: FormControl;
   userDataSet: any[];
   usersList: any[];
+  addButtonLabel: string = 'Add';
+  cancelButtonLabel: string = 'Reset';
+  showAdd:boolean;
+
   @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
 
   constructor(private sessionService: SessionService) {
     this.userGroup = new FormGroup({
       firstName: new FormControl('', Validators.required),
       lastName: new FormControl(''),
-      employee_Id: new FormControl('', Validators.required)
+      employeeId: new FormControl('', Validators.required),
+      user_id : new FormControl('')
     });
     this.filter = new FormControl('');
 
@@ -31,11 +36,30 @@ export class AddUserComponent implements OnInit {
 
   ngOnInit() {
     this.getUserList();
+    this.showAdd=true;
+  }
+
+  updateUser(user: any) {
+    console.log(user);
+    this.userGroup.setValue({firstName: user.firstName,
+      lastName: user.lastName, employeeId: user.employeeId,user_id: user.user_Id});
+
+   // this.showUpdate=true;
+    this.showAdd=false;
+  }
+
+  deleteUser(user: any) {
+    console.log('delete user ' + user);
+    alert(user.user_Id);
+    const that = this;
+    this.sessionService.deleteUser(user).subscribe(x=>{
+      that.getUserList();
+    });
   }
 
   getUserList() {
     this.sessionService.getUsers().subscribe(x => {
-      this.userDataSet = x;
+     this.userDataSet = x;
       this.usersList = this.userDataSet;
     });
   }
@@ -45,7 +69,7 @@ export class AddUserComponent implements OnInit {
       const term = text.toLowerCase();
       return user.project.toLowerCase().includes(term)
         || user.lastName.toLowerCase().includes(term)
-        || user.employee_Id.toLowerCase().includes(term);
+        || user.employeeId.toLowerCase().includes(term);
     });
   }
 
@@ -56,8 +80,17 @@ export class AddUserComponent implements OnInit {
     });
   }
 
+  update(){
+   this.sessionService.updateUser(this.userGroup.value).subscribe(x => {
+        this.reset();
+        this.getUserList();
+      });
+  }
+
   reset() {
     this.userGroup.reset();
+    this.addButtonLabel = 'Add';
+    this.cancelButtonLabel = 'Reset';
   }
 
   onSort({column, direction}: SortEvent) {

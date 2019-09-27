@@ -1,6 +1,16 @@
 <div style="margin: 2rem">
 
   <form [formGroup]="taskForm" (ngSubmit)="add()">
+
+    <!--<div class="row"  *ngIf="showMsg">
+      <div class="col-xs-12">
+        <p class="alert alert-success">
+          <strong>Registration Success!</strong> Please click here to login!.
+
+        </p>
+      </div>
+    </div>-->
+
     <div class="form-group row">
       <label for="project" class="col-sm-2 col-form-label">Project</label>
       <div class="col-sm-10">
@@ -11,7 +21,7 @@
     <div class="form-group row">
       <label for="project" class="col-sm-2 col-form-label">Task</label>
       <div class="col-sm-10">
-        <input class="form-control" id="task" placeholder="Enter Project Name" type="text" formControlName="task">
+        <input class="form-control" id="task" placeholder="Enter Task Name" type="text" formControlName="task">
       </div>
     </div>
     <div class="form-group row">
@@ -28,6 +38,7 @@
       </div>
     </div>
 
+
     <div class="form-group row">
       <label for="parentTask" class="col-sm-2 col-form-label">Parent Task</label>
       <div class="col-sm-10">
@@ -38,15 +49,15 @@
 
     <div class="form-group row">
       <label for="startDate" class="col-sm-2 col-form-label">Start Date</label>
-      <div class="col-sm-4">
-        <input class="form-control" style="display: inline-flex;" id="startDate" placeholder="Start Date" type="text" formControlName="startDate" ngbDatepicker #sd="ngbDatepicker">
+      <div class="col-sm-4" style="display: inline-flex;">
+        <input class="form-control"  id="startDate" placeholder="Start Date" type="text" formControlName="startDate" ngbDatepicker #sd="ngbDatepicker">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary calendar" (click)="sd.toggle()" type="button"></button>
         </div>
       </div>
       <label for="endDate" class="col-sm-1 col-form-label">End Date</label>
-      <div class="col-sm-4">
-        <input class="form-control" style="display: inline-flex;" id="endDate" placeholder="End Date" type="text" formControlName="endDate" ngbDatepicker #ed="ngbDatepicker">
+      <div class="col-sm-4" style="display: inline-flex;">
+        <input class="form-control" id="endDate" placeholder="End Date" type="text" formControlName="endDate" ngbDatepicker #ed="ngbDatepicker">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary calendar" (click)="ed.toggle()" type="button"></button>
         </div>
@@ -65,5 +76,6 @@
       <button class="btn btn-primary btn-space" (click)="reset()">Reset</button>
     </div>
   </form>
+
 
 </div>

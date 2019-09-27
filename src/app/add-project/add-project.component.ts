@@ -1,10 +1,12 @@
 import {Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {SessionService} from '../session.service';
-import {Observable} from 'rxjs';
-import {debounceTime, distinctUntilChanged, filter, map, switchMap} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap} from 'rxjs/operators';
 import {compare, NgbdSortableHeader, SortEvent} from '../sortable.directive';
 import {ajax} from 'rxjs/ajax';
+import {NgbDateParserFormatter} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCalendar, NgbDate, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-add-project',
@@ -17,15 +19,20 @@ export class AddProjectComponent implements OnInit {
   filter: FormControl;
   filteredProjects: any[];
   projectList: any[];
+  searching: boolean = false;
   @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
 
-  constructor(private sessionService: SessionService) {
+  constructor(private sessionService: SessionService, private ngbDateParserFormatter: NgbDateParserFormatter) {
     this.projectForm = new FormGroup({
       project: new FormControl('', Validators.required),
       startDate: new FormControl(''),
       endDate: new FormControl('', Validators.required),
-      priority: new FormControl('', Validators.required),
-      manager: new FormControl('', Validators.required)
+      priority: new FormControl('0', Validators.required),
+      manager: new FormControl('', Validators.required),
+      completedTask: new FormControl(''),
+      totalTask: new FormControl(''),
+      startEndDateCheckbox:new FormControl(''),
+      managerId: new FormControl('')
     });
 
     this.filter = new FormControl('');
@@ -37,6 +44,19 @@ export class AddProjectComponent implements OnInit {
 
   ngOnInit() {
     this.getProjectList();
+     this.projectForm.get('endDate').disable();
+                this.projectForm.get('startDate').disable();
+    this.projectForm.get('startEndDateCheckbox').valueChanges.subscribe(x => {
+          if(x){
+            this.projectForm.get('endDate').enable();
+            this.projectForm.get('startDate').enable();
+
+          } else {
+            this.projectForm.get('endDate').disable();
+            this.projectForm.get('startDate').disable();
+          }
+          console.log(x);
+        });
   }
 
   getProjectList() {
@@ -47,9 +67,14 @@ export class AddProjectComponent implements OnInit {
   }
 
   add() {
-    this.sessionService.addProject(this.projectForm.value).subscribe(x=>{
+    const project = JSON.parse(JSON.stringify(this.projectForm.value));
+    project.endDate = this.ngbDateParserFormatter.format(project.endDate);
+    project.startDate = this.ngbDateParserFormatter.format(project.startDate);
+    project.managerId = project.manager.user_Id;
+    this.sessionService.addProject(project).subscribe(x => {
       console.log(x);
     });
+    this.getProjectList();
   }
 
   reset() {
@@ -84,22 +109,27 @@ export class AddProjectComponent implements OnInit {
 
   updateProject(selectedProject: any) {
     console.log(selectedProject);
-    const sd = selectedProject.startDate.split('-');
-    const ed = selectedProject.endDate.split('-');
-    const processedStartDate = {year: Number(sd[2]), month: Number(sd[1]) , day: Number(sd[0])};
-    const processedEndDate = {year: Number(ed[2]), month: Number(ed[1]), day: Number(ed[0])};
     this.projectForm.setValue({project: selectedProject.project,
-      startDate: processedStartDate, endDate: processedEndDate, priority: selectedProject.priority, manager: selectedProject.manager});
+      startDate: this.ngbDateParserFormatter.parse(selectedProject.startDate), endDate: this.ngbDateParserFormatter.parse(selectedProject.endDate)
+      , priority: selectedProject.priority, manager: selectedProject.manager});
   }
+
+  formatter = (result: any) => result.firstName +' '+result.lastName;
+
+  resultFormatter = (result: any) => result.user_Id;
 
   type = (text$: Observable<string>) =>
     text$.pipe(
-      filter(text => text.length > 2),
-      debounceTime(200),
+      debounceTime(300),
       distinctUntilChanged(),
-      switchMap(term => ajax('./assets/manager.json')),
-      map(response => response.response)
-    );
-
-  formatter = (result: any) => result.project;
+      tap(() => this.searching = true),
+      switchMap(term =>
+        this.sessionService.managerSearch(term).pipe(
+          tap(() => console.log('')),
+          catchError(() => {
+            return of([]);
+          }))
+      ),
+      tap(() => this.searching = false)
+    )
 }

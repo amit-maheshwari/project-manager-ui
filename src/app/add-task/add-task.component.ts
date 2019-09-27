@@ -5,6 +5,9 @@ import {Observable} from 'rxjs';
 import {debounceTime, distinctUntilChanged, filter, map, switchMap} from 'rxjs/operators';
 import {ajax} from 'rxjs/ajax';
 
+import {NgbDateParserFormatter} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCalendar, NgbDate, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
+
 @Component({
   selector: 'app-add-task',
   templateUrl: './add-task.component.html',
@@ -13,7 +16,8 @@ import {ajax} from 'rxjs/ajax';
 export class AddTaskComponent implements OnInit {
 
   taskForm: FormGroup;
-  constructor(private sessionService: SessionService) {
+  showMsg : string = 'N';
+  constructor(private sessionService: SessionService, private ngbDateParserFormatter: NgbDateParserFormatter) {
     this.taskForm = new FormGroup({
       project: new FormControl('', Validators.required),
       task: new FormControl('', Validators.required),
@@ -22,8 +26,10 @@ export class AddTaskComponent implements OnInit {
       startDate: new FormControl(''),
       endDate: new FormControl('', Validators.required),
       priority: new FormControl('', Validators.required),
-      user: new FormControl('', Validators.required)
+      user: new FormControl('', Validators.required),
+      project_id: new FormControl('')
     });
+
   }
 
   ngOnInit() {
@@ -43,10 +49,17 @@ export class AddTaskComponent implements OnInit {
       }
       console.log(x);
     });
+
   }
 
   add() {
-    this.sessionService.addTask(this.taskForm.value);
+  const task = JSON.parse(JSON.stringify(this.taskForm.value));
+      task.endDate = this.ngbDateParserFormatter.format(task.endDate);
+      task.startDate = this.ngbDateParserFormatter.format(task.startDate);
+      task.project_id = task.project.project_id;
+    this.sessionService.addTask(task).subscribe(x => {
+          this.reset();
+        });
   }
 
   reset() {
@@ -59,6 +72,7 @@ export class AddTaskComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       switchMap(term => ajax('./assets/projects.json')),
+     //switchMap(term => this.sessionService.getProjectsList()),
       map(response => response.response)
     )
 
@@ -69,11 +83,11 @@ export class AddTaskComponent implements OnInit {
       filter(text => text.length > 2),
       debounceTime(200),
       distinctUntilChanged(),
-      switchMap(term => ajax('./assets/projects.json')),
+      switchMap(term => ajax('./assets/parentTask.json')),
       map(response => response.response)
     )
 
-  parentTaskFormatter =  (result: any) => result.project;
+  parentTaskFormatter =  (result: any) => result.task;
 
   userSearch = (text$: Observable<string>) =>
      text$.pipe(

@@ -1,5 +1,5 @@
 <div style="margin: 2rem">
-  <form [formGroup]="userGroup" (ngSubmit)="add()">
+  <form [formGroup]="userGroup">
     <div class="form-group row">
       <label for="firstName" class="col-sm-2 col-form-label">First Name</label>
       <div class="col-sm-10">
@@ -13,20 +13,21 @@
       </div>
     </div>
     <div class="form-group row">
-      <label for="employee_Id" class="col-sm-2 col-form-label">Employee ID</label>
+      <label for="employeeId" class="col-sm-2 col-form-label">Employee ID</label>
       <div class="col-sm-10">
-        <input class="form-control" style="width: 50%" id="employee_Id" placeholder="Enter Employee ID" type="text" formControlName="employee_Id">
+        <input class="form-control" style="width: 50%" id="employeeId" placeholder="Enter Employee ID" type="text" formControlName="employeeId">
       </div>
     </div>
     <div class="text-right">
-      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" [disabled]="!userGroup.valid">Add</button>
-      <button class="btn btn-primary btn-space" (click)="reset()">Reset</button>
+      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" (click)="add()" [disabled]="!userGroup.valid" id="add" >Add</button>
+      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" (click)="update()" [disabled]="!userGroup.valid"  id="update" >Update</button>
+      <button class="btn btn-primary btn-space" (click)="reset()">{{cancelButtonLabel}}</button>
     </div>
   </form>
 
   <hr>
 
-  <div class="form-group row">
+  <div class="form-group row" style="padding-left: 1rem">
     <input class="form-control" style="width: 50%" placeholder="Search" type="text" [formControl]="filter"/>
   </div>
 
@@ -35,7 +36,8 @@
     <tr>
       <th scope="col" sortable="firstName" (sort)="onSort($event)">First Name</th>
       <th scope="col" sortable="lastName" (sort)="onSort($event)">Last Name</th>
-      <th scope="col" sortable="employee_Id" (sort)="onSort($event)">Employee Id</th>
+      <th scope="col" sortable="employeeId" (sort)="onSort($event)">Employee Id</th>
+      <th scope="col"> Action </th>
     </tr>
     </thead>
     <tbody>
@@ -44,7 +46,20 @@
          <ngb-highlight [result]="user.firstName" [term]="filter.value"></ngb-highlight>
       </td>
       <td><ngb-highlight [result]="user.lastName" [term]="filter.value"></ngb-highlight></td>
-      <td><ngb-highlight [result]="user.employee_Id" [term]="filter.value"></ngb-highlight></td>
+      <td><ngb-highlight [result]="user.employeeId" [term]="filter.value"></ngb-highlight></td>
+
+      <td>
+        <button class="close" type="button" style="float: left;" (click)="updateUser(user)">
+          <svg height="20" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 10.935v2.131l-8 3.947v-2.23l5.64-2.783-5.64-2.79v-2.223l8 3.948zm-16 3.848l-5.64-2.783 5.64-2.79v-2.223l-8 3.948v2.131l8 3.947v-2.23zm7.047-10.783h-2.078l-4.011 16h2.073l4.016-16z">
+            </path>
+          </svg>
+        </button>
+        <button class="close" type="button" style="float: left;padding-left: 1rem;" (click)="deleteUser(user)">
+          <span>×</span>
+        </button>
+      </td>
+
     </tr>
     </tbody>
   </table>

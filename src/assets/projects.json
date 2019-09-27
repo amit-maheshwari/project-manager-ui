@@ -1,5 +1,6 @@
 [{
   "project": "TIM UI",
+  "project_id" : 2,
   "noOfTasks": "12",
   "priority": "23",
   "startDate": "2-2-2019",
@@ -13,6 +14,7 @@
   }, {
   "project": "DTC Confirmation",
   "noOfTasks": "12",
+  "project_id" : 2,
   "priority": "30",
   "startDate": "2-2-2019",
   "endDate": "6-8-2019",
@@ -25,38 +27,13 @@
 },
   {
     "project": "DTC",
+    "project_id" : 3,
     "noOfTasks": "7",
     "priority": "3",
     "startDate": "2-2-2019",
     "endDate": "6-12-2020",
     "manager": {
       "firstName": "DHawan",
-      "lastName": "M",
-      "employeeId": "406803"
-    },
-    "completed": "N"
-  },
-  {
-    "project": "MX",
-    "noOfTasks": "9",
-    "priority": "3",
-    "startDate": "2-2-2019",
-    "endDate": "6-2-2020",
-    "manager": {
-      "firstName": "Shreyas",
-      "lastName": "M",
-      "employeeId": "406803"
-    },
-    "completed": "N"
-  },
-  {
-    "project": "Ios Cash",
-    "noOfTasks": "2",
-    "priority": "1",
-    "startDate": "2-2-2019",
-    "endDate": "6-7-2020",
-    "manager": {
-      "firstName": "Rishab",
       "lastName": "M",
       "employeeId": "406803"
     },
