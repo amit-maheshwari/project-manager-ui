@@ -6,8 +6,9 @@ import { AddProjectComponent } from './add-project/add-project.component';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { AddUserComponent } from './add-user/add-user.component';
 import { ViewTaskComponent } from './view-task/view-task.component';
+import {ResponseInterceptor} from './http.interceptor'
 
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HttpClient, HttpClientModule,HTTP_INTERCEPTORS} from '@angular/common/http';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbdSortableHeader} from './sortable.directive';
@@ -30,7 +31,13 @@ import {NgbdSortableHeader} from './sortable.directive';
     ReactiveFormsModule,
     NgbModule
   ],
-  providers: [HttpClient],
+  providers: [HttpClient,
+  {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ResponseInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

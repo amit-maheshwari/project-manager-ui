@@ -1,17 +1,27 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {HttpParams} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {Observable, of, BehaviorSubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
 
-  constructor(private http: HttpClient) { }
+  private _userList: BehaviorSubject<any>;
+
+  constructor(private http: HttpClient) {
+    this._userList = new BehaviorSubject<any>(null);
+    this.loadUserList();
+  }
+
+
+
+  get userList():BehaviorSubject<any>{
+    return this._userList;
+  }
 
   addTask(task: any):Observable<any> {
-
       return this.http.post('http://localhost:8080/fsd/tasks',task);
   }
 
@@ -19,6 +29,15 @@ export class SessionService {
     //return this.http.get('./assets/users.json');
     return this.http.get('http://localhost:8080/fsd/users');
   }
+
+  loadUserList() {
+
+      this.getUsers().subscribe(x=>{
+                            this._userList = x;
+      });
+
+  }
+
   addUser(user: any):Observable<any> {
     console.log(user);
    return this.http.post("http://localhost:8080/fsd/users",user);
@@ -47,11 +66,21 @@ export class SessionService {
 
   }
 
+  deleteProject(projectId: any): Observable<any>{
+  let url = `http://localhost:8080/fsd/projects/${projectId}`;
+      return this.http.delete(url);
+    }
+
   getTaskLists(): Observable<any> {
-    return this.http.get('./assets/tasks.json');
+    return this.http.get("http://localhost:8080/fsd/tasks");
   }
 
   managerSearch(term:any): Observable<any> {
     return this.http.get('http://localhost:8080/fsd/users');
+  }
+
+  getUserById(userId:any){
+  let url = `http://localhost:8080/fsd/users/${userId}`;
+    return this.http.get(url);
   }
 }

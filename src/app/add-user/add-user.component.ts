@@ -50,7 +50,7 @@ export class AddUserComponent implements OnInit {
 
   deleteUser(user: any) {
     console.log('delete user ' + user);
-    alert(user.user_Id);
+
     const that = this;
     this.sessionService.deleteUser(user).subscribe(x=>{
       that.getUserList();

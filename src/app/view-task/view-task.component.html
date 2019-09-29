@@ -2,17 +2,18 @@
   <thead>
   <tr>
     <th scope="col" sortable="task" (sort)="onSort($event)">Task</th>
-    <th scope="col" sortable="noOfTasks" (sort)="onSort($event)">No Of Task</th>
+    <th scope="col" sortable="noOfTasks" (sort)="onSort($event)">Parent</th>
     <th scope="col" sortable="priority" (sort)="onSort($event)">Priority</th>
     <th scope="col" sortable="startDate" (sort)="onSort($event)">Start Date</th>
     <th scope="col" sortable="endDate" (sort)="onSort($event)">End Date</th>
-    <th scope="col" sortable="completed" (sort)="onSort($event)">Completed</th>
+    <th scope="col" sortable="completed" (sort)="onSort($event)">Action</th>
   </tr>
   </thead>
   <tbody>
   <tr *ngFor="let task of taskList; index as i">
     <td><ngb-highlight [result]="task.task"></ngb-highlight></td>
-    <td><ngb-highlight [result]="task.noOfTasks"></ngb-highlight></td>
+    <td>
+      <ngb-highlight [result]="task.isParent"></ngb-highlight></td>
     <td><ngb-highlight [result]="task.priority"></ngb-highlight></td>
     <td><ngb-highlight [result]="task.startDate"></ngb-highlight></td>
     <td><ngb-highlight [result]="task.endDate"></ngb-highlight></td>

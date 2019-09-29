@@ -70,16 +70,28 @@
         <th scope="col" sortable="startDate" (sort)="onSort($event)">Start Date</th>
         <th scope="col" sortable="endDate" (sort)="onSort($event)">End Date</th>
         <th scope="col" sortable="completed" (sort)="onSort($event)">Completed</th>
+        <th scope="col" sortable="completed" >Action</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let project of filteredProjects; index as i" (click)="updateProject(project)">
+      <tr *ngFor="let project of filteredProjects; index as i">
         <td><ngb-highlight [result]="project.project" [term]="filter.value"></ngb-highlight></td>
         <td><ngb-highlight [result]="project.totalTask" [term]="filter.value"></ngb-highlight></td>
         <td><ngb-highlight [result]="project.priority" [term]="filter.value"></ngb-highlight></td>
         <td><ngb-highlight [result]="project.startDate" [term]="filter.value"></ngb-highlight></td>
         <td><ngb-highlight [result]="project.endDate" [term]="filter.value"></ngb-highlight></td>
         <td><ngb-highlight [result]="project.completedTask" [term]="filter.value"></ngb-highlight></td>
+        <td>
+          <button class="close" type="button" style="float: left;" (click)="updateProject(project)">
+            <svg height="20" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 10.935v2.131l-8 3.947v-2.23l5.64-2.783-5.64-2.79v-2.223l8 3.948zm-16 3.848l-5.64-2.783 5.64-2.79v-2.223l-8 3.948v2.131l8 3.947v-2.23zm7.047-10.783h-2.078l-4.011 16h2.073l4.016-16z">
+              </path>
+            </svg>
+          </button>
+          <button class="close" type="button" style="float: left;padding-left: 1rem;" (click)="deleteProject(project.project_Id)">
+            <span>×</span>
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>
