@@ -25,6 +25,7 @@ export class AddProjectComponent implements OnInit {
   totalTask:any;
   managerId:any;
   projectId:any;
+  showAdd:boolean = true;
 
   @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
 
@@ -39,7 +40,7 @@ export class AddProjectComponent implements OnInit {
       //totalTask: new FormControl('0'),
       startEndDateCheckbox:new FormControl(false),
       //managerId: new FormControl(''),
-     // projectId : new FormControl('')
+      // projectId : new FormControl('')
     });
 
     this.filter = new FormControl('');
@@ -51,29 +52,26 @@ export class AddProjectComponent implements OnInit {
 
   ngOnInit() {
     this.getProjectList();
-    this.sessionService.userList.subscribe(x=>{
-      this.userList=x;
-    });
     this.projectForm.get('endDate').disable();
     this.projectForm.get('startDate').disable();
     this.projectForm.get('startEndDateCheckbox').valueChanges.subscribe(x => {
-          if(x){
-            const endDate = this.projectForm.get('endDate')
-            endDate.enable();
-           // const t:NgbDateStruct = {year: new Date().getFullYear(), month: new Date().getMonth(), day: new Date().getMonth()}
-            endDate.setValue({year: new Date().getFullYear(), month: new Date().getMonth()+1, day: new Date().getUTCDate()+1})
-            const startDate = this.projectForm.get('startDate')
-            startDate.enable();
-            startDate.setValue({year: new Date().getFullYear(), month: new Date().getMonth()+1, day: new Date().getUTCDate()})
+      if(x){
+        const endDate = this.projectForm.get('endDate')
+        endDate.enable();
+        // const t:NgbDateStruct = {year: new Date().getFullYear(), month: new Date().getMonth(), day: new Date().getMonth()}
+        endDate.setValue({year: new Date().getFullYear(), month: new Date().getMonth()+1, day: new Date().getUTCDate()+1})
+        const startDate = this.projectForm.get('startDate')
+        startDate.enable();
+        startDate.setValue({year: new Date().getFullYear(), month: new Date().getMonth()+1, day: new Date().getUTCDate()})
 
-          } else {
-            this.projectForm.get('endDate').disable();
-            this.projectForm.get('startDate').disable();
-            this.projectForm.get('endDate').reset();
-            this.projectForm.get('startDate').reset();
-          }
-          console.log(x);
-        });
+      } else {
+        this.projectForm.get('endDate').disable();
+        this.projectForm.get('startDate').disable();
+        this.projectForm.get('endDate').reset();
+        this.projectForm.get('startDate').reset();
+      }
+      console.log(x);
+    });
   }
 
   getProjectList() {
@@ -128,48 +126,59 @@ export class AddProjectComponent implements OnInit {
   updateProject(selectedProject: any) {
 
     const fakeUser = {employeeId: 78965,
-                      firstName: "Kanchan",
-                      lastName: "Dokania",
-                      project_Id: null,
-                      task_id: null,
-                      user_Id: 1}
+      firstName: "Kanchan",
+      lastName: "Dokania",
+      project_Id: null,
+      task_id: null,
+      user_Id: 1}
     console.log(selectedProject);
     this.managerId = selectedProject.managerId;
-     this.projectId = selectedProject.project_Id;
+    this.projectId = selectedProject.project_Id;
     this.projectForm.setValue({project: selectedProject.project,
       startDate: this.ngbDateParserFormatter.parse(selectedProject.startDate), endDate: this.ngbDateParserFormatter.parse(selectedProject.endDate)
       , priority: selectedProject.priority, manager: fakeUser,
       startEndDateCheckbox:true,
-      });
+    });
+    this.showAdd=false;
   }
 
-  deleteProject(projectId:any){
-  const that = this;
-  this.sessionService.deleteProject(projectId).subscribe(x=>{
-        that.getProjectList();
-      });
+  deleteProject(projectId: any) {
+    const that = this;
+    this.sessionService.deleteProject(projectId).subscribe(x => {
+      that.getProjectList();
+    });
   }
+
+  update(){
+     this.sessionService.updateProject(this.projectForm.value).subscribe(x => {
+          this.reset();
+          this.getProjectList();
+        });
+    }
 
   formatter = (result: any) => {
-  if(result) result.firstName +' '+result.lastName
-  };
-
-  resultFormatter = (result: any) => {
-  result.user_Id
+    if(result) { return result.firstName + ' ' + result.lastName}
   };
 
   type = (text$: Observable<string>) =>
     text$.pipe(
-    //  debounceTime(300),
+      debounceTime(300),
       distinctUntilChanged(),
-      tap(() => this.searching = true),
-      switchMap(term =>
-        this.sessionService.managerSearch(term).pipe(
-          tap(() => console.log('')),
-          catchError(() => {
-            return of([]);
-          }))
-      ),
-      tap(() => this.searching = false)
+      map(term => this.filterManagerSearch(term))
     )
+
+  filterManagerSearch(searchText: string) {
+    const users: any [] = this.sessionService.userList;
+    return searchText.length < 2 ? []
+      : users.filter(v => {
+        return v.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 || v.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      }).slice(0, 10);
+  }
+
+  blurHandler() {
+    const managerControl = this.projectForm.controls['manager'];
+    if(managerControl.value && !managerControl.value.user_Id){
+      managerControl.reset();
+    }
+  }
 }

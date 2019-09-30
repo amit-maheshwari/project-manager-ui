@@ -72,16 +72,7 @@ export class AddTaskComponent implements OnInit {
      text$.pipe(
       //filter(text => text.length > 2),
       debounceTime(200),
-      distinctUntilChanged(),
-       tap(() => this.searching = true),
-     switchMap(term =>
-                 this.sessionService.projectSearch(term).pipe(
-                   tap(() => console.log('')),
-                   catchError(() => {
-                     return of([]);
-                   }))
-               ),
-               tap(() => this.searching = false)
+      map(term => this.filterProjectSearch(term))
     )
 
 
@@ -92,15 +83,7 @@ export class AddTaskComponent implements OnInit {
      // filter(text => text.length > 2),
       debounceTime(200),
       distinctUntilChanged(),
-       tap(() => this.searchingParent = true),
-           switchMap(term =>
-                       this.sessionService.parentTaskSearch(term).pipe(
-                         tap(() => console.log('')),
-                         catchError(() => {
-                           return of([]);
-                         }))
-                     ),
-                     tap(() => this.searchingParent = false)
+      map(term => this.filterParentTaskSearch(term))
     )
 
   parentTaskFormatter =  (result: any) => result.task;
@@ -109,11 +92,46 @@ export class AddTaskComponent implements OnInit {
      text$.pipe(
       filter(text => text.length > 2),
       debounceTime(200),
-      distinctUntilChanged(),
-      switchMap(term => ajax('./assets/manager.json')),
-      map(response => response.response)
+       map(term => this.filterUserSearch(term))
     )
 
-  userFormatter =  (result: any) => result.firstName;
+ filterUserSearch(searchText: string) {
+    const users: any [] = this.sessionService.userList;
+    return searchText.length < 2 ? []
+      : users.filter(v => {
+        return v.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 || v.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      }).slice(0, 10);
+  }
+
+ filterProjectSearch(searchText: string) {
+    const projects: any [] = this.sessionService.projectList;
+    return searchText.length < 2 ? []
+      : projects.filter(v => {
+        return v.project.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      }).slice(0, 10);
+  }
+
+ filterParentTaskSearch(searchText: string) {
+    const parentTasks: any [] = this.sessionService.parentTasksList;
+    return searchText.length < 2 ? []
+      : parentTasks.filter(v => {
+        return v.task.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      }).slice(0, 10);
+  }
+
+ blurHandler(controlName: string) {
+    const userControl = this.taskForm.controls[controlName];
+    if(userControl.value){
+     if((controlName =='user' && !userControl.value.user_Id)
+        || (controlName =='parentTask' && !userControl.value.task_id)
+        || (controlName =='project' && !userControl.value.project_Id)) {
+          userControl.reset();
+       }
+    }
+  }
+
+  userFormatter =  (result: any) => {
+                       if(result) { return result.firstName + ' ' + result.lastName}
+                     };
 
 }
