@@ -58,12 +58,19 @@ export class AddProjectComponent implements OnInit {
     this.projectForm.get('startDate').disable();
     this.projectForm.get('startEndDateCheckbox').valueChanges.subscribe(x => {
           if(x){
-            this.projectForm.get('endDate').enable();
-            this.projectForm.get('startDate').enable();
+            const endDate = this.projectForm.get('endDate')
+            endDate.enable();
+           // const t:NgbDateStruct = {year: new Date().getFullYear(), month: new Date().getMonth(), day: new Date().getMonth()}
+            endDate.setValue({year: new Date().getFullYear(), month: new Date().getMonth()+1, day: new Date().getUTCDate()+1})
+            const startDate = this.projectForm.get('startDate')
+            startDate.enable();
+            startDate.setValue({year: new Date().getFullYear(), month: new Date().getMonth()+1, day: new Date().getUTCDate()})
 
           } else {
             this.projectForm.get('endDate').disable();
             this.projectForm.get('startDate').disable();
+            this.projectForm.get('endDate').reset();
+            this.projectForm.get('startDate').reset();
           }
           console.log(x);
         });
@@ -119,12 +126,19 @@ export class AddProjectComponent implements OnInit {
   }
 
   updateProject(selectedProject: any) {
+
+    const fakeUser = {employeeId: 78965,
+                      firstName: "Kanchan",
+                      lastName: "Dokania",
+                      project_Id: null,
+                      task_id: null,
+                      user_Id: 1}
     console.log(selectedProject);
     this.managerId = selectedProject.managerId;
      this.projectId = selectedProject.project_Id;
     this.projectForm.setValue({project: selectedProject.project,
       startDate: this.ngbDateParserFormatter.parse(selectedProject.startDate), endDate: this.ngbDateParserFormatter.parse(selectedProject.endDate)
-      , priority: selectedProject.priority, manager: this.sessionService.getUserById(selectedProject.manager),
+      , priority: selectedProject.priority, manager: fakeUser,
       startEndDateCheckbox:true,
       });
   }
@@ -136,24 +150,26 @@ export class AddProjectComponent implements OnInit {
       });
   }
 
-  formatter = (result: any) => result.firstName +' '+result.lastName;
+  formatter = (result: any) => {
+  if(result) result.firstName +' '+result.lastName
+  };
 
-  resultFormatter = (result: any) => result.user_Id;
+  resultFormatter = (result: any) => {
+  result.user_Id
+  };
 
   type = (text$: Observable<string>) =>
     text$.pipe(
-      debounceTime(300),
+    //  debounceTime(300),
       distinctUntilChanged(),
-      map(term => term.length <2 ?[]
-      :this.userList.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) >-1).slice(0,10))
-      //tap(() => this.searching = true),
-    //  switchMap(term =>
-      //  this.sessionService.managerSearch(term).pipe(
-        //  tap(() => console.log('')),
-          //catchError(() => {
-            //return of([]);
-          //}))
-      //),
-      //tap(() => this.searching = false)
+      tap(() => this.searching = true),
+      switchMap(term =>
+        this.sessionService.managerSearch(term).pipe(
+          tap(() => console.log('')),
+          catchError(() => {
+            return of([]);
+          }))
+      ),
+      tap(() => this.searching = false)
     )
 }

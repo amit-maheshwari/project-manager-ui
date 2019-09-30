@@ -16,7 +16,7 @@ export class AddUserComponent implements OnInit {
   usersList: any[];
   addButtonLabel: string = 'Add';
   cancelButtonLabel: string = 'Reset';
-  showAdd:boolean;
+  showAdd:boolean = true;
 
   @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
 
@@ -36,7 +36,6 @@ export class AddUserComponent implements OnInit {
 
   ngOnInit() {
     this.getUserList();
-    this.showAdd=true;
   }
 
   updateUser(user: any) {

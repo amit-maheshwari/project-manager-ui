@@ -76,7 +76,18 @@ export class SessionService {
   }
 
   managerSearch(term:any): Observable<any> {
-    return this.http.get('http://localhost:8080/fsd/users');
+   let url = `http://localhost:8080/fsd/users/search/${term}`;
+    return this.http.get(url);
+  }
+
+  projectSearch(term:any): Observable<any> {
+    let url = `http://localhost:8080/fsd/projects/search/${term}`;
+     return this.http.get(url);
+   }
+
+   parentTaskSearch(term:any): Observable<any> {
+    let url = `http://localhost:8080/fsd//parentTasks/${term}`;
+    return this.http.get(url);
   }
 
   getUserById(userId:any){

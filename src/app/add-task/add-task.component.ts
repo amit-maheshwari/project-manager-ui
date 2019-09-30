@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {SessionService} from '../session.service';
-import {Observable} from 'rxjs';
-import {debounceTime, distinctUntilChanged, filter, map, switchMap} from 'rxjs/operators';
+import {Observable,of} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, map, switchMap,tap,catchError} from 'rxjs/operators';
 import {ajax} from 'rxjs/ajax';
 
 import {NgbDateParserFormatter} from '@ng-bootstrap/ng-bootstrap';
@@ -17,6 +17,8 @@ export class AddTaskComponent implements OnInit {
 
   taskForm: FormGroup;
   showMsg : string = 'N';
+  searching: boolean = false;
+  searchingParent:boolean =false;
   constructor(private sessionService: SessionService, private ngbDateParserFormatter: NgbDateParserFormatter) {
     this.taskForm = new FormGroup({
       project: new FormControl('', Validators.required),
@@ -68,23 +70,37 @@ export class AddTaskComponent implements OnInit {
 
   projectSearch = (text$: Observable<string>) =>
      text$.pipe(
-      filter(text => text.length > 2),
+      //filter(text => text.length > 2),
       debounceTime(200),
       distinctUntilChanged(),
-      switchMap(term => ajax('./assets/projects.json')),
-     //switchMap(term => this.sessionService.getProjectsList()),
-      map(response => response.response)
+       tap(() => this.searching = true),
+     switchMap(term =>
+                 this.sessionService.projectSearch(term).pipe(
+                   tap(() => console.log('')),
+                   catchError(() => {
+                     return of([]);
+                   }))
+               ),
+               tap(() => this.searching = false)
     )
+
 
   projectFormatter = (result: any) => result.project;
 
   parentTaskSearch = (text$: Observable<string>) =>
     text$.pipe(
-      filter(text => text.length > 2),
+     // filter(text => text.length > 2),
       debounceTime(200),
       distinctUntilChanged(),
-      switchMap(term => ajax('./assets/parentTask.json')),
-      map(response => response.response)
+       tap(() => this.searchingParent = true),
+           switchMap(term =>
+                       this.sessionService.parentTaskSearch(term).pipe(
+                         tap(() => console.log('')),
+                         catchError(() => {
+                           return of([]);
+                         }))
+                     ),
+                     tap(() => this.searchingParent = false)
     )
 
   parentTaskFormatter =  (result: any) => result.task;
