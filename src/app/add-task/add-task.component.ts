@@ -17,8 +17,6 @@ export class AddTaskComponent implements OnInit {
 
   taskForm: FormGroup;
   showMsg : string = 'N';
-  searching: boolean = false;
-  searchingParent:boolean =false;
   constructor(private sessionService: SessionService, private ngbDateParserFormatter: NgbDateParserFormatter) {
     this.taskForm = new FormGroup({
       project: new FormControl('', Validators.required),
@@ -58,7 +56,7 @@ export class AddTaskComponent implements OnInit {
   const task = JSON.parse(JSON.stringify(this.taskForm.value));
       task.endDate = this.ngbDateParserFormatter.format(task.endDate);
       task.startDate = this.ngbDateParserFormatter.format(task.startDate);
-      task.project_id = task.project.project_id;
+      task.project_id = task.project.project_Id;
     this.sessionService.addTask(task).subscribe(x => {
           this.reset();
         });
@@ -86,7 +84,9 @@ export class AddTaskComponent implements OnInit {
       map(term => this.filterParentTaskSearch(term))
     )
 
-  parentTaskFormatter =  (result: any) => result.task;
+  parentTaskFormatter =  (result: any) => {
+        if(result){return result.task.task}
+      };
 
   userSearch = (text$: Observable<string>) =>
      text$.pipe(
@@ -115,7 +115,7 @@ export class AddTaskComponent implements OnInit {
     const parentTasks: any [] = this.sessionService.parentTasksList;
     return searchText.length < 2 ? []
       : parentTasks.filter(v => {
-        return v.task.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+        return v.task.task.toLowerCase().indexOf(searchText.toLowerCase()) > -1
       }).slice(0, 10);
   }
 
@@ -123,7 +123,7 @@ export class AddTaskComponent implements OnInit {
     const userControl = this.taskForm.controls[controlName];
     if(userControl.value){
      if((controlName =='user' && !userControl.value.user_Id)
-        || (controlName =='parentTask' && !userControl.value.task_id)
+        || (controlName =='parentTask' && !userControl.value.parent_id)
         || (controlName =='project' && !userControl.value.project_Id)) {
           userControl.reset();
        }

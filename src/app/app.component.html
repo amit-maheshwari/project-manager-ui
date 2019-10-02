@@ -1,6 +1,10 @@
 <div style="margin: 2rem">
   Project Manager
 
+  <p *ngIf="showAlert">
+    <ngb-alert type="danger" (close)="close()">{{ message }}</ngb-alert>
+  </p>
+
   <ngb-tabset>
     <ngb-tab title="Add Project">
       <ng-template ngbTabContent>

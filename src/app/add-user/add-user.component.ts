@@ -45,15 +45,17 @@ export class AddUserComponent implements OnInit {
 
    // this.showUpdate=true;
     this.showAdd=false;
+    this.cancelButtonLabel='Cancel';
   }
 
   deleteUser(user: any) {
     console.log('delete user ' + user);
-
-    const that = this;
-    this.sessionService.deleteUser(user).subscribe(x=>{
-      that.getUserList();
-    });
+    if(confirm("Are you sure to delete user "+user.firstName +" ?")) {
+      const that = this;
+      this.sessionService.deleteUser(user).subscribe(x=>{
+        that.getUserList();
+      });
+    }
   }
 
   getUserList() {
@@ -88,8 +90,8 @@ export class AddUserComponent implements OnInit {
 
   reset() {
     this.userGroup.reset();
-    this.addButtonLabel = 'Add';
     this.cancelButtonLabel = 'Reset';
+    this.showAdd=true;
   }
 
   onSort({column, direction}: SortEvent) {
@@ -108,5 +110,14 @@ export class AddUserComponent implements OnInit {
       });
     }
   }
+
+  numberOnly(event): boolean {
+      const charCode = (event.which) ? event.which : event.keyCode;
+      if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+      }
+      return true;
+
+    }
 
 }

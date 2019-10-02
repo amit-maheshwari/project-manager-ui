@@ -20,7 +20,6 @@ export class AddProjectComponent implements OnInit {
   filteredProjects: any[];
   projectList: any[];
   userList: any[];
-  searching: boolean = false;
   completedTask:any;
   totalTask:any;
   managerId:any;
@@ -63,7 +62,7 @@ export class AddProjectComponent implements OnInit {
         date = new Date(date.setDate(date.getDate() + 1));
         const endDate = this.projectForm.get('endDate')
         endDate.enable();
-        endDate.setValue({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getUTCDate() + 1});
+        endDate.setValue({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getUTCDate()});
       } else {
         this.projectForm.get('endDate').disable();
         this.projectForm.get('startDate').disable();
@@ -82,21 +81,20 @@ export class AddProjectComponent implements OnInit {
   }
 
 
- add() {
-     const project = JSON.parse(JSON.stringify(this.projectForm.value));
-     project.endDate = this.ngbDateParserFormatter.format(project.endDate);
-     project.startDate = this.ngbDateParserFormatter.format(project.startDate);
-     project.managerId = project.manager.user_Id;
-     this.sessionService.addProject(project).subscribe(x => {
-       this.reset();
-       this.getProjectList();
-     });
+  add() {
+    const project = JSON.parse(JSON.stringify(this.projectForm.value));
+    project.endDate = this.ngbDateParserFormatter.format(project.endDate);
+    project.startDate = this.ngbDateParserFormatter.format(project.startDate);
+    project.managerId = project.manager.user_Id;
+    this.sessionService.addProject(project).subscribe(x => {
+      this.reset();
+      this.getProjectList();
+    });
 
-   }
+  }
 
   reset() {
     this.projectForm.reset();
-    this.showAdd=true;
   }
 
   filterProjectList(text: string): any[] {
@@ -126,7 +124,15 @@ export class AddProjectComponent implements OnInit {
   }
 
   updateProject(selectedProject: any) {
-   console.log(selectedProject);
+
+    const fakeUser = {employeeId: 78965,
+      firstName: "Kanchan",
+      lastName: "Dokania",
+      project_Id: null,
+      task_id: null,
+      user_Id: 1}
+
+    console.log(selectedProject);
     this.managerId = selectedProject.managerId;
     this.projectId = selectedProject.project_Id;
     this.projectForm.setValue({project: selectedProject.project,
@@ -137,23 +143,18 @@ export class AddProjectComponent implements OnInit {
     this.showAdd=false;
   }
 
- update(){
-   const project = JSON.parse(JSON.stringify(this.projectForm.value));
-    project.endDate = this.ngbDateParserFormatter.format(project.endDate);
-    project.startDate = this.ngbDateParserFormatter.format(project.startDate);
-   this.sessionService.updateProject(project, this.projectId).subscribe(x => {
-   this.reset();
-   this.getProjectList();
-   });
- }
+   update(){
+       this.sessionService.updateProject(this.projectForm.value).subscribe(x => {
+            this.reset();
+            this.getProjectList();
+          });
+      }
 
   deleteProject(projectId: any) {
-  if(confirm("Are you sure to delete the project?")) {
-      const that = this;
-      this.sessionService.deleteProject(projectId).subscribe(x => {
-        that.getProjectList();
-      });
-    }
+    const that = this;
+    this.sessionService.deleteProject(projectId).subscribe(x => {
+      that.getProjectList();
+    });
   }
 
   formatter = (result: any) => {

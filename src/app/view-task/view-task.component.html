@@ -1,3 +1,13 @@
+
+<div class="form-group row" style="margin: 2rem">
+  <label for="project" class="col-sm-2 col-form-label font-weight-bold">Project</label>
+  <div class="col-sm-6">
+    <input class="form-control" id="project" placeholder="Enter Project Name" type="text"
+           formControlName="project" [ngbTypeahead]="projectSearch" [resultFormatter]="projectFormatter" [inputFormatter]="projectFormatter" (blur)="blurHandler('project')">
+    <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" (click)="search()" style="margin: 1rem">Search</button>
+  </div>
+</div>
+
 <table class="table table-striped">
   <thead>
   <tr>
@@ -6,18 +16,81 @@
     <th scope="col" sortable="priority" (sort)="onSort($event)">Priority</th>
     <th scope="col" sortable="startDate" (sort)="onSort($event)">Start Date</th>
     <th scope="col" sortable="endDate" (sort)="onSort($event)">End Date</th>
-    <th scope="col" sortable="completed" (sort)="onSort($event)">Action</th>
+    <th scope="col">Action</th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let task of taskList; index as i">
-    <td><ngb-highlight [result]="task.task"></ngb-highlight></td>
+  <tr *ngFor="let taskGroup of taskFormArray.controls; index as i" [formGroup]="taskGroup">
     <td>
-      <ngb-highlight [result]="task.isParent"></ngb-highlight></td>
-    <td><ngb-highlight [result]="task.priority"></ngb-highlight></td>
-    <td><ngb-highlight [result]="task.startDate"></ngb-highlight></td>
-    <td><ngb-highlight [result]="task.endDate"></ngb-highlight></td>
-    <td><ngb-highlight [result]="task.completed"></ngb-highlight></td>
+      <span *ngIf="!isRowEdited(i)">{{getValue(i,'task')}}</span>
+      <div *ngIf="isRowEdited(i)" class="form-group row">
+        <div class="col-sm-10">
+          <input class="form-control" placeholder="Enter Task Name" type="text" formControlName="task">
+        </div>
+      </div>
+    </td>
+    <td *ngIf="!getValue(i,'isParent')">
+
+      <span *ngIf="!isRowEdited(i)">{{getParentTask(i,'parentTask')}}</span>
+      <div *ngIf="isRowEdited(i)" class="form-group row">
+        <div class="col-sm-10">
+<!--           <input class="form-control" type="text" formControlName="parentTask.task.task">-->
+          <input class="form-control" id="parentTask" placeholder="Enter Parent Task" type="text" formControlName="parentTask"
+                 [ngbTypeahead]="parentTaskSearch" [resultFormatter]="parentTaskFormatter" [inputFormatter]="parentTaskFormatter">
+        </div>
+      </div>
+    </td>
+    <td *ngIf="getValue(i,'isParent')">
+
+      <span *ngIf="!isRowEdited(i)"></span>
+      <div *ngIf="isRowEdited(i)" class="form-group row">
+        <div class="col-sm-10" *ngIf="isParent">
+          <input class="form-control" type="text" formControlName="parentTask">
+        </div>
+      </div>
+    </td>
+    <td>
+      <span *ngIf="!isRowEdited(i)">{{getValue(i,'priority')}}</span>
+      <div *ngIf="isRowEdited(i)" class="form-group row">
+        <div class="col-sm-10">
+          <input class="form-control" placeholder="Enter Task Priority" type="text" formControlName="priority">
+        </div>
+      </div>
+    </td>
+    <td>
+      <span *ngIf="!isRowEdited(i)">{{getDateValue(i,'startDate')}}</span>
+      <div *ngIf="isRowEdited(i)" class="input-group col-sm-10" style="display: inline-flex;">
+        <input class="form-control" placeholder="Start Date"
+               name="dp" formControlName="startDate" ngbDatepicker #d="ngbDatepicker">
+        <div class="input-group-append" style="height: 2.3rem;">
+          <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button">
+            <i class="fa fa-calendar"></i>
+          </button>
+        </div>
+      </div>
+    </td>
+    <td>
+      <span *ngIf="!isRowEdited(i)">{{getDateValue(i,'endDate')}}</span>
+      <div *ngIf="isRowEdited(i)" class="input-group col-sm-10" style="display: inline-flex;">
+        <input class="form-control" placeholder="End Date"
+               name="ed" formControlName="endDate" ngbDatepicker #ed="ngbDatepicker">
+        <div class="input-group-append" style="height: 2.3rem;">
+          <button class="btn btn-outline-secondary calendar" (click)="ed.toggle()" type="button">
+            <i class="fa fa-calendar"></i>
+          </button>
+        </div>
+      </div>
+    </td>
+    <td>
+      <span *ngIf="!isRowEdited(i) && !getValue(i,'completed')">
+           <button  class="btn btn-primary btn-space" style="margin: 0 1rem" (click)="editTask(i)">Edit Task</button>
+            <button *ngIf="!isRowEdited(i)" class="btn btn-danger btn-space" (click)="endTask(i)">End Task</button>
+      </span>
+
+
+      <button *ngIf="isRowEdited(i)" class="btn btn-primary btn-space" style="margin: 0 1rem" (click)="saveTask(i)">Save</button>
+      <button *ngIf="isRowEdited(i)" class="btn btn-primary btn-space" (click)="cancel(i,taskGroup)">Cancel</button>
+    </td>
   </tr>
   </tbody>
 </table>

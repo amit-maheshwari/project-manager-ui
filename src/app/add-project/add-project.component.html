@@ -1,10 +1,10 @@
 <div style="margin: 2rem">
 
-  <form [formGroup]="projectForm" (ngSubmit)="add()">
+  <form [formGroup]="projectForm" >
     <div class="form-group row">
       <label for="project" class="col-sm-2 col-form-label">Project</label>
-      <div class="col-sm-10">
-        <input class="form-control" id="project" placeholder="Enter Project Name" type="text" formControlName="project">
+      <div class="col-sm-6">
+        <input class="form-control" id="project" placeholder="Enter Project Name" type="text" formControlName="project" maxlength="30">
       </div>
     </div>
 
@@ -14,7 +14,7 @@
         <input class="form-control" style="width: 1.5rem; height: 1.4rem; margin-top: 0.5em;margin-right: 1rem" id="startEndDateCheckbox" type="checkbox" formControlName="startEndDateCheckbox">
         <label for="startEndDateCheckbox" class="col-form-label">Set Start and End Date</label>
       </div>
-      <div class="input-group col-sm-4" style="display: inline-flex;">
+      <div class="input-group col-sm-2" style="display: inline-flex;">
         <input class="form-control" placeholder="Start Date"
                name="dp" formControlName="startDate" ngbDatepicker #d="ngbDatepicker">
         <div class="input-group-append" style="height: 2.3rem;">
@@ -23,7 +23,7 @@
           </button>
         </div>
       </div>
-      <div class="input-group col-sm-4" style="display: inline-flex;">
+      <div class="input-group col-sm-2" style="display: inline-flex;">
         <input class="form-control" placeholder="End Date"
                name="ed" formControlName="endDate" ngbDatepicker #ed="ngbDatepicker">
         <div class="input-group-append" style="height: 2.3rem;">
@@ -36,22 +36,23 @@
 
     <div class="form-group row">
       <label for="priority" class="col-sm-2 col-form-label">Priority</label>
-      <div class="col-sm-10">
+      <div class="col-sm-6">
         <input class="form-control" id="priority" placeholder="Enter Priority" type="range" formControlName="priority" min="0" max="40">
       </div>
     </div>
 
     <div class="form-group row">
       <label for="manager" class="col-sm-2 col-form-label">Manager</label>
-      <div class="col-sm-10">
+      <div class="col-sm-6">
         <input class="form-control" id="manager" placeholder="Manager Search" type="text" formControlName="manager"
                [ngbTypeahead]="type" [resultFormatter]="formatter" [inputFormatter]="formatter" (blur)="blurHandler()">
       </div>
     </div>
-    <div class="text-right">
-      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" [disabled]="!projectForm.valid" *ngIf="showAdd">Add</button>
-      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" [disabled]="!projectForm.valid" *ngIf="!showAdd">Update</button>
-      <button class="btn btn-primary btn-space" (click)="reset()">Reset</button>
+    <div class="form-group row">
+      <span class="col-sm-7"></span>
+      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" [disabled]="!projectForm.valid" (click)="add()" id="add" *ngIf="showAdd">Add</button>
+      <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" [disabled]="!projectForm.valid" (click)="update()" id="update" *ngIf="!showAdd">Update</button>
+      <button class="btn btn-secondary btn-space" (click)="reset()">Reset</button>
     </div>
   </form>
 
@@ -82,15 +83,8 @@
         <td><ngb-highlight [result]="project.endDate" [term]="filter.value"></ngb-highlight></td>
         <td><ngb-highlight [result]="project.completedTask" [term]="filter.value"></ngb-highlight></td>
         <td>
-          <button class="close" type="button" style="float: left;" (click)="updateProject(project)">
-            <svg height="20" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 10.935v2.131l-8 3.947v-2.23l5.64-2.783-5.64-2.79v-2.223l8 3.948zm-16 3.848l-5.64-2.783 5.64-2.79v-2.223l-8 3.948v2.131l8 3.947v-2.23zm7.047-10.783h-2.078l-4.011 16h2.073l4.016-16z">
-              </path>
-            </svg>
-          </button>
-          <button class="close" type="button" style="float: left;padding-left: 1rem;" (click)="deleteProject(project.project_Id)">
-            <span>×</span>
-          </button>
+          <button  class="btn btn-primary btn-space" style="margin: 0 1rem" (click)="updateProject(project)">Edit</button>
+          <button  class="btn btn-danger btn-space" style="margin: 0 1rem" (click)="deleteProject(project.project_Id)">Delete</button>
         </td>
       </tr>
     </tbody>
