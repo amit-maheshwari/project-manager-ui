@@ -1,15 +1,18 @@
 
-<div class="form-group row" style="margin: 2rem">
+<div class="form-group row" style="margin: 2rem" [formGroup]="projectFormGroup">
   <label for="project" class="col-sm-2 col-form-label font-weight-bold">Project</label>
   <div class="col-sm-6">
     <input class="form-control" id="project" placeholder="Enter Project Name" type="text"
-           formControlName="project" [ngbTypeahead]="projectSearch" [resultFormatter]="projectFormatter" [inputFormatter]="projectFormatter" (blur)="blurHandler('project')">
+           formControlName="projectSearchControl" [ngbTypeahead]="projectSearch" [resultFormatter]="projectFormatter" [inputFormatter]="projectFormatter" (blur)="blurHandler('project')">
     <button class="btn btn-primary btn-space" style="margin: 0 1rem" type="submit" (click)="search()" style="margin: 1rem">Search</button>
   </div>
 </div>
 
-<table class="table table-striped">
+<table class="table table-striped" *ngIf="selectedProjectId">
   <thead>
+   <tr class="info">
+     <td colspan="6" style="font-style: italic; color: #ff0000;">Search results for Project : <b>{{selectedProjectName}}</b></td>
+  </tr>
   <tr>
     <th scope="col" sortable="task" (sort)="onSort($event)">Task</th>
     <th scope="col" sortable="noOfTasks" (sort)="onSort($event)">Parent</th>

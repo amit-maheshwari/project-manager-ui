@@ -1,8 +1,18 @@
 <div style="margin: 2rem">
-  Project Manager
+
+  <div class = "page-header text-center">
+    <h5>
+      Project Manager
+    </h5>
+  </div>
+
 
   <p *ngIf="showAlert">
     <ngb-alert type="danger" (close)="close()">{{ message }}</ngb-alert>
+  </p>
+
+  <p *ngIf="successMessage">
+    <ngb-alert type="success" (close)="close()">{{ successMessage }}</ngb-alert>
   </p>
 
   <ngb-tabset>

@@ -49,6 +49,23 @@ export class AddTaskComponent implements OnInit {
       }
       console.log(x);
     });
+    const endDateControl = this.taskForm.controls['endDate'];
+    const startDateControl = this.taskForm.controls['startDate'];
+    const ngbDateParserFormatter = this.ngbDateParserFormatter;
+    endDateControl.valueChanges.subscribe(x =>{
+      const sDateValue = startDateControl.value;
+      if(x && x != "" && new Date(ngbDateParserFormatter.format(x)).getTime() < new Date(ngbDateParserFormatter.format(sDateValue)).getTime()){
+        alert("End Date should be greater than Start Date");
+        endDateControl.reset();
+      }
+    });
+    startDateControl.valueChanges.subscribe(x=>{
+      const eDateValue = endDateControl.value;
+      if(x && x != "" && new Date(ngbDateParserFormatter.format(x)).getTime() > new Date(ngbDateParserFormatter.format(eDateValue)).getTime()){
+        alert("Start Date should be less than End Date");
+        startDateControl.reset();
+      }
+    });
 
   }
 
@@ -99,7 +116,8 @@ export class AddTaskComponent implements OnInit {
     const users: any [] = this.sessionService.userList;
     return searchText.length < 2 ? []
       : users.filter(v => {
-        return v.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 || v.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+        return (v.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 || v.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
+        &&  (!v.task_id)
       }).slice(0, 10);
   }
 

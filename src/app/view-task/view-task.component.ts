@@ -17,24 +17,55 @@ export class ViewTaskComponent implements OnInit {
   taskList: any[];
   taskFormArray: FormArray;
   editedRow: number = -1;
+  projectFormGroup: FormGroup;
+  selectedProjectId: number;
+  selectedProjectName: string = '';
 
   @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
 
   constructor(private sessionService: SessionService, private ngbDateParserFormatter: NgbDateParserFormatter) {
     this.taskFormArray = new FormArray([]);
-
+    this.projectFormGroup = new FormGroup({});
+    this.projectFormGroup.addControl('projectSearchControl',  new FormControl(''));
   }
 
   ngOnInit() {
-    this.getTasksList();
+   // this.getTasksList();
+  }
+
+  blurHandler() {
+    const searchControl = this.projectFormGroup.controls['projectSearchControl'];
+    if(searchControl.value && !searchControl.value.project_Id){
+      searchControl.reset();
+    }
+  }
+
+  search(){
+    const search = this.projectFormGroup.value.projectSearchControl;
+    if(!search){
+      alert('Please select a Project');
+    }else{
+      this.selectedProjectId = search.project_Id;
+      this.selectedProjectName =search.project;
+      //console.log(search);
+      this.sessionService.searchTask(search.project_Id).
+      subscribe(x => {
+                     this.taskList = x;
+                     this.originalTaskList = x;
+                     this.updateFormArray();
+                     this.projectFormGroup.controls['projectSearchControl'].reset();
+                    });
+    }
   }
 
   getTasksList() {
-    this.sessionService.getTaskLists().subscribe(x => {
-      this.taskList = x;
-      this.originalTaskList = x;
-      this.updateFormArray();
-    });
+   this.sessionService.searchTask(this.selectedProjectId).
+         subscribe(x => {
+                        this.taskList = x;
+                        this.originalTaskList = x;
+                        this.updateFormArray();
+                       // this.projectFormGroup.controls['projectSearchControl'].reset();
+                       });
   }
 
   updateFormArray() {
@@ -86,7 +117,7 @@ export class ViewTaskComponent implements OnInit {
   }
   deleteTask(i) {
     this.editedRow=-1;
-    alert("deleted row "+i);
+   // alert("deleted row "+i);
   }
 
   saveTask(i) {
@@ -181,8 +212,5 @@ export class ViewTaskComponent implements OnInit {
   }
 
  projectFormatter = (result: any) => result.project;
-
- search(){
- }
 
 }

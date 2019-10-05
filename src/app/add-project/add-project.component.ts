@@ -52,8 +52,25 @@ export class AddProjectComponent implements OnInit {
 
   ngOnInit() {
     this.getProjectList();
-    this.projectForm.get('endDate').disable();
-    this.projectForm.get('startDate').disable();
+    const endDateControl = this.projectForm.get('endDate');
+    const startDateControl = this.projectForm.get('startDate');
+    const _this = this.ngbDateParserFormatter;
+    startDateControl.disable();
+    endDateControl.disable();
+    endDateControl.valueChanges.subscribe(x=>{
+      const sDateValue = startDateControl.value;
+      if(x && x != "" && new Date(_this.format(x)).getTime() < new Date(_this.format(sDateValue)).getTime()){
+        alert("End Date should be greater than Start Date");
+        endDateControl.reset();
+      }
+    });
+    startDateControl.valueChanges.subscribe(x=>{
+      const eDateValue = endDateControl.value;
+      if(x && x != "" && new Date(_this.format(x)).getTime() > new Date(_this.format(eDateValue)).getTime()){
+        alert("Start Date should be less than End Date");
+        startDateControl.reset();
+      }
+    });
     this.projectForm.get('startEndDateCheckbox').valueChanges.subscribe(x => {
       if(x){
         let date = new Date();
@@ -63,7 +80,7 @@ export class AddProjectComponent implements OnInit {
         date = new Date(date.setDate(date.getDate() + 1));
         const endDate = this.projectForm.get('endDate')
         endDate.enable();
-        endDate.setValue({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getUTCDate() + 1});
+        endDate.setValue({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getUTCDate()});
       } else {
         this.projectForm.get('endDate').disable();
         this.projectForm.get('startDate').disable();
@@ -77,6 +94,7 @@ export class AddProjectComponent implements OnInit {
   getProjectList() {
     this.sessionService.getProjectsList().subscribe(x => {
       this.projectList = x;
+      this.sessionService.updateProjectList(x);
       this.filteredProjects = this.projectList;
     });
   }
@@ -171,7 +189,8 @@ export class AddProjectComponent implements OnInit {
     const users: any [] = this.sessionService.userList;
     return searchText.length < 2 ? []
       : users.filter(v => {
-        return v.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 || v.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+        return (v.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 || v.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
+        && (!v.project_Id)
       }).slice(0, 10);
   }
 

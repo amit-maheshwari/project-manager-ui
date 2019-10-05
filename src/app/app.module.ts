@@ -6,7 +6,7 @@ import { AddProjectComponent } from './add-project/add-project.component';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { AddUserComponent } from './add-user/add-user.component';
 import { ViewTaskComponent } from './view-task/view-task.component';
-import {ResponseInterceptor} from './http.interceptor'
+import {HttpConfigInterceptor} from './http.interceptor'
 
 import {HttpClient, HttpClientModule,HTTP_INTERCEPTORS} from '@angular/common/http';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -34,7 +34,7 @@ import {NgbdSortableHeader} from './sortable.directive';
   providers: [HttpClient,
   {
       provide: HTTP_INTERCEPTORS,
-      useClass: ResponseInterceptor,
+      useClass: HttpConfigInterceptor,
       multi: true
     }
   ],
