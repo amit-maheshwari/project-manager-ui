@@ -36,6 +36,14 @@ export class SessionService {
     this._projectList = projectList;
   }
 
+  updateUserList(userList :any){
+  this._userList = userList;
+  }
+
+  updateParentTaskList(parentTaskList: any){
+    this._parentTaskList = parentTaskList;
+    }
+
   get parentTasksList() {
     return this._parentTaskList;
   }

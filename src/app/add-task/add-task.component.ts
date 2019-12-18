@@ -76,6 +76,7 @@ export class AddTaskComponent implements OnInit {
       task.project_id = task.project.project_Id;
     this.sessionService.addTask(task).subscribe(x => {
           this.reset();
+          this.sessionService.loadParentTaskList();
         });
   }
 

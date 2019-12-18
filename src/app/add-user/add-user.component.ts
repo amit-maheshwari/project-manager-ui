@@ -62,6 +62,7 @@ export class AddUserComponent implements OnInit {
     this.sessionService.getUsers().subscribe(x => {
      this.userDataSet = x;
       this.usersList = this.userDataSet;
+      this.sessionService.updateUserList(x);
     });
   }
 
